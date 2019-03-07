@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
-const db = new Sequelize('postgres://localhost:5432/wikistack', {logging: false});
+const db = new Sequelize('postgres://localhost:5432/wikistack', { logging: false });
+
 // const db = new Sequelize('wikistack', {
 //   host: 'localhost',
 //   port: 5432,
@@ -7,44 +8,59 @@ const db = new Sequelize('postgres://localhost:5432/wikistack', {logging: false}
 // })
 
 
-db.authenticate().then(()=>{
+db.authenticate().then(() => {
   console.log('connected to db')
 })
 const Page = db.define('page', {
   title: {
     type: Sequelize.STRING,
-    notEmpty: true,
     allowNull: false,
-    stringLength(val){
-      return val.length <= 200 && val.length > 0
+    validate: {
+      notEmpty: true,
+      stringLength(val) {
+        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
+      },
     },
-  slug: {
-    type: Sequelize.STRING
-  },
-  content: {
-
-    type: Sequelize.TEXT
-  },
-  status: {
-    type: Sequelize.ENUM('open', 'closed')
+    slug: {
+      type: Sequelize.STRING
+    },
+    content: {
+      type: Sequelize.TEXT
+    },
+    status: {
+      type: Sequelize.ENUM('open', 'closed')
+    }
   }
-  }})
+})
 
 const User = db.define('user', {
   name: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    allowNull: false,
+    validate: {
+      isValidUsername(val) {
+        return !/[^\w\._]|\.\.+/g.test(val)
+      },
+      notEmpty: true
+    }
   },
   email: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true,
+      notEmpty: true
+    }
   }
 });
 
-const main = async ()=>{
+const main = async () => {
   await Page.sync()
   await User.sync()
   console.log('everything synced')
 }
 
-main()
 
-module.exports = { db };
+
+module.exports = { db, Page, User, main };
+
