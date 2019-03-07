@@ -42,11 +42,48 @@ module.exports = function () {
             User.create({
                 email: 'bob@gmail.com'
             }).then(({ dataValues }) => {
-                console.log('FAILED TEST');
+                done(new Error('failed'))
             }).catch(e => {
                 done()
             })
         })
+        it('Should not create a user with an invalid email', done =>{
+            User.create({
+                name: 'Jessy',
+                email: 'derp'
+            }).then(()=>{
+                done(new Error('failed'))
+            }).catch(err=>{
+                done()
+            })
+
+        })
 
     })
+    describe('Pages',()=>{
+        it('Should create a page', done=>{
+            const testPage =   {
+                title: 'This is our Test Title',
+                slug: 'slug string',
+                content: 'bla bla bla bla content',
+                status: 'open'
+                }
+            Page.create(testPage
+            ).then(({ dataValues })=>{
+                expect(dataValues).toEqual({...testPage, updatedAt: expect.any(Date),
+                    createdAt: expect.any(Date), id: 1})
+            }).then(done).catch(done)
+        })
+        it('Should not create a page without a title', done=>{
+           Page.create({
+            slug: 'slug string',
+            content: 'bla bla bla bla content',
+            status: 'open'
+            }).then(()=>done(new Error('no title!')))
+            .catch(err=>{
+                done()
+            })
+        })
+    })
+
 }

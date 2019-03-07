@@ -21,15 +21,20 @@ const Page = db.define('page', {
         return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
       },
     },
-    slug: {
-      type: Sequelize.STRING
-    },
-    content: {
-      type: Sequelize.TEXT
-    },
-    status: {
-      type: Sequelize.ENUM('open', 'closed')
-    }
+  },
+  slug: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+      stringLength(val) {
+        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
+      }
+  }},
+  content: {
+    type: Sequelize.TEXT
+  },
+  status: {
+    type: Sequelize.ENUM('open', 'closed')
   }
 })
 
