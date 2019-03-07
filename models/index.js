@@ -11,32 +11,6 @@ const db = new Sequelize('postgres://localhost:5432/wikistack', { logging: false
 db.authenticate().then(() => {
   console.log('connected to db')
 })
-const Page = db.define('page', {
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      stringLength(val) {
-        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
-      },
-    },
-  },
-  slug: {
-    type: Sequelize.STRING,
-    validate: {
-      notEmpty: true,
-      stringLength(val) {
-        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
-      }
-  }},
-  content: {
-    type: Sequelize.TEXT
-  },
-  status: {
-    type: Sequelize.ENUM('open', 'closed')
-  }
-})
 
 const User = db.define('user', {
   name: {
@@ -58,6 +32,43 @@ const User = db.define('user', {
     }
   }
 });
+const Page = db.define('page', {
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      stringLength(val) {
+        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
+      },
+    },
+  },
+  slug: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true,
+      stringLength(val) {
+        return val.length <= 200 && val.length > 0 && !/[^\w\.\s]|\.\.+/g.test(val)
+      }
+    }
+  },
+  content: {
+    type: Sequelize.TEXT
+  },
+  status: {
+    type: Sequelize.ENUM('open', 'closed')
+  },
+  userid: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
+  }
+})
+
+
 
 const main = async () => {
   await Page.sync()
